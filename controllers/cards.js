@@ -39,6 +39,7 @@ const getCards = (req, res) => {
 const deleteCard = (req, res) => {
   const { cardid } = req.params;
   Card.findByIdAndRemove(cardid)
+    .orFail(() => new Error('Not Found'))
     .then((cards) => {
       res.send(cards);
     })
@@ -59,12 +60,14 @@ const deleteCard = (req, res) => {
 
 const putLikeCard = (req, res) => {
   const { cardId } = req.params;
-  console.log(req.params);
+
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
+    .orFail(() => new Error('Not Found'))
     .then((cards) => {
       res.send(cards);
     })
     .catch((err) => {
+      console.log(err);
       if (err.name === 'CastError') {
         res
           .status(400)
@@ -84,6 +87,7 @@ const putLikeCard = (req, res) => {
 const deleteLikeCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
+    .orFail(() => new Error('Not Found'))
     .then((cards) => {
       res.send(cards);
     })
