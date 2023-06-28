@@ -60,7 +60,7 @@ const deleteCard = (req, res) => {
 const putLikeCard = (req, res) => {
   const { cardId } = req.params;
   console.log(req.params);
-  Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } })
+  Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
     .then((cards) => {
       res.send(cards);
     })
@@ -83,7 +83,7 @@ const putLikeCard = (req, res) => {
 
 const deleteLikeCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } })
+  Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
     .then((cards) => {
       res.send(cards);
     })
