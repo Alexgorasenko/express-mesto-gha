@@ -62,12 +62,10 @@ const getUser = (req, res) => {
     });
 };
 
-const updateUser = (req, res) => {
-  const { name, about } = req.body;
-  console.log(name, about);
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
+
+const updateUserData = (Name, data, req, res) =>{
+  Name.findByIdAndUpdate(req.user._id, data, { new: true, runValidators: true })
     .then((user) => {
-      console.log(user);
       res.send(user);
     })
     .catch((err) => {
@@ -85,29 +83,16 @@ const updateUser = (req, res) => {
         res.status(ERROR_INTERNAL_SERVER).send({ message: 'Внутренняя ошибка сервера' });
       }
     });
+}
+
+const updateUser = (req, res) => {
+  const { name, about } = req.body;
+  updateUserData(User, { name, about }, req, res);
 };
 
 const updateUsersAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
-    .then((user) => {
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res
-          .status(ERROR_INACCURATE_DATA)
-          .send({
-            message: 'Переданы некорректные данные при обновлении профиля',
-          });
-      } else if (err.message === 'Not Found') {
-        res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: 'Пользователь с указанным id не найден' });
-      } else {
-        res.status(ERROR_INTERNAL_SERVER).send({ message: 'Внутренняя ошибка сервера' });
-      }
-    });
+  updateUserData(User, { avatar }, req, res);
 };
 
 module.exports = {
