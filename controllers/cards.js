@@ -73,7 +73,6 @@ const putLikeCard = (req, res) => {
       res.send(cards);
     })
     .catch((err) => {
-      console.log(err);
       if (err.name === 'CastError') {
         res
           .status(ERROR_INACCURATE_DATA)

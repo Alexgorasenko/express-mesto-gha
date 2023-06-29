@@ -62,8 +62,7 @@ const getUser = (req, res) => {
     });
 };
 
-
-const updateUserData = (Name, data, req, res) =>{
+const updateUserData = (Name, data, req, res) => {
   Name.findByIdAndUpdate(req.user._id, data, { new: true, runValidators: true })
     .then((user) => {
       res.send(user);
@@ -83,7 +82,7 @@ const updateUserData = (Name, data, req, res) =>{
         res.status(ERROR_INTERNAL_SERVER).send({ message: 'Внутренняя ошибка сервера' });
       }
     });
-}
+};
 
 const updateUser = (req, res) => {
   const { name, about } = req.body;
