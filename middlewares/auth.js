@@ -2,14 +2,12 @@ const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
   const token = req.headers.cookie;
-  console.log(token);
-
   let payload;
-
+  console.log(req.headers);
   try {
     payload = jwt.verify(token, 'super_strong_password');
   } catch (err) {
-    res.status(401).send({ message: 'Необходима авторизация' });
+    return res.status(401).send({ message: 'Неверный логин или пароль' });
   }
 
   req.user = payload;
