@@ -15,27 +15,36 @@ const NotFoundError = require('../utils/NotFoundError');
 const UnauthorizedError = require('../utils/UnauthorizedError');
 
 const createUser = (req, res, next) => {
-  const {
-    name, about, avatar, email, password,
-  } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
-  return bcrypt.hash(password, SALT_ROUNDS, (error, hash) => {
-    User.create({
-      name, about, avatar, email, password: hash,
-    })
-      .then((user) => {
-        res.send(user._id, user.name, user.about, user.avatar, user.email);
-      })
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
-        } else if (err.code === 11000) {
-          next(new ConflictingError('Пользователь с таким email уже существует'));
-        } else {
-          next(err);
-        }
+  bcrypt
+    .hash(password, SALT_ROUNDS)
+    .then((hash) => {
+      User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash,
       });
-  });
+    })
+    .then((user) => {
+      res.send(user._id, user.name, user.about, user.avatar, user.email);
+    })
+    .catch((err) => {
+      console.log('123');
+      if (err.name === 'ValidationError') {
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные при создании пользователя'
+          )
+        );
+      } else if (err.code === 11000) {
+        next(new ConflictingError('Пользователь с таким email уже существует'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const getUsers = (req, res, next) => {
@@ -56,7 +65,11 @@ const getUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные при поиске пользователя по id'));
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные при поиске пользователя по id'
+          )
+        );
       } else if (err.message === 'Not Found') {
         next(new NotFoundError('Пользователь по указанному _id не найден'));
       } else {
@@ -72,7 +85,11 @@ const updateUserData = (Name, data, req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные при обновлении профиля'
+          )
+        );
       } else if (err.message === 'Not Found') {
         next(new NotFoundError('Пользователь с указанным id не найден'));
       } else {
