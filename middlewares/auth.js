@@ -1,9 +1,10 @@
 const jwt = require('jsonwebtoken');
 
 const auth = (req, res, next) => {
-  const token = req.headers.cookie;
-  let payload;
-  console.log(req.headers);
+  const token = req.cookies.jwt;
+  let payload
+  console.log(token);
+
   try {
     payload = jwt.verify(token, 'super_strong_password');
   } catch (err) {
