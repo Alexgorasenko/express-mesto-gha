@@ -5,4 +5,4 @@ class ConflictingError extends Error {
   }
 }
 
-module.exports =  ConflictingError;
+module.exports = ConflictingError;

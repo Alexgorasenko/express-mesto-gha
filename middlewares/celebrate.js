@@ -1,4 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
+
 const { regexImageLink } = require('../utils/regexImageLink');
 
 const validateCreateCard = celebrate({

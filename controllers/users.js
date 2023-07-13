@@ -15,12 +15,16 @@ const NotFoundError = require('../utils/NotFoundError');
 const UnauthorizedError = require('../utils/UnauthorizedError');
 
 const createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
   return bcrypt.hash(password, SALT_ROUNDS, (error, hash) => {
     User.create({ name, about, avatar, email, password: hash })
       .then((user) => {
-        const { _id, name, about, avatar, email } = user;
+        const {
+          _id, name, about, avatar, email,
+        } = user;
         res.send({ _id, name, about, avatar, email });
       })
       .catch((err) => {
