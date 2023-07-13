@@ -1,6 +1,6 @@
-const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 
 const SALT_ROUNDS = 10;
 
@@ -20,24 +20,17 @@ const createUser = (req, res, next) => {
   } = req.body;
 
   return bcrypt.hash(password, SALT_ROUNDS, (error, hash) => {
-    User.create({ name, about, avatar, email, password: hash })
+    User.create({
+      name, about, avatar, email, password: hash,
+    })
       .then((user) => {
-        const {
-          _id, name, about, avatar, email,
-        } = user;
-        res.send({ _id, name, about, avatar, email });
+        res.send(user._id, user.name, user.about, user.avatar, user.email);
       })
       .catch((err) => {
         if (err.name === 'ValidationError') {
-          next(
-            new BadRequestError(
-              'Переданы некорректные данные при создании пользователя'
-            )
-          );
+          next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
         } else if (err.code === 11000) {
-          next(
-            new ConflictingError('Пользователь с таким email уже существует')
-          );
+          next(new ConflictingError('Пользователь с таким email уже существует'));
         } else {
           next(err);
         }
@@ -113,7 +106,7 @@ const login = (req, res, next) => {
               maxAge: 3600 * 24 * 7,
               httpOnly: true,
             });
-            return res.send(token);
+            res.send(token);
           } else {
             throw new UnauthorizedError('Неверный логин или пароль');
           }

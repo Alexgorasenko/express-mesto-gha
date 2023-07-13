@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 
 const app = express();
 
+const cookieParser = require('cookie-parser');
+
 const router = require('./routes/index');
 
 const error = require('./middlewares/error');
-
-const cookieParser = require('cookie-parser');
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
