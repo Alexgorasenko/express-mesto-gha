@@ -1,17 +1,12 @@
 const Card = require('../models/card');
 
-const  BadRequestError = require("../utils/BadRequestError");
+const BadRequestError = require('../utils/BadRequestError');
 
-const  ConflictingError = require("../utils/ConflictingError");
+const ForbiddenError = require('../utils/ForbiddenError');
 
-const  ForbiddenError = require("../utils/ForbiddenError");
-
-const  NotFoundError = require("../utils/NotFoundError");
-
-const  UnauthorizedError = require("../utils/UnauthorizedError");
+const NotFoundError = require('../utils/NotFoundError');
 
 const createCard = (req, res, next) => {
-
   const {
     name, link,
   } = req.body;
@@ -59,12 +54,11 @@ const deleteCard = (req, res, next) => {
     });
 };
 
-
-const putLikeCard = (req, res) => {
+const putLikeCard = (req, res, next) => {
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })
-  .orFail(new NotFoundError('Передан несуществующий id карточки'))
+    .orFail(new NotFoundError('Передан несуществующий id карточки'))
     .then((cards) => {
       res.send(cards);
     })
@@ -77,10 +71,10 @@ const putLikeCard = (req, res) => {
     });
 };
 
-const deleteLikeCard = (req, res) => {
+const deleteLikeCard = (req, res, next) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(cardId, { $pull: { likes: req.user._id } }, { new: true })
-  .orFail(new NotFoundError('Передан несуществующий id карточки'))
+    .orFail(new NotFoundError('Передан несуществующий id карточки'))
     .then((cards) => {
       res.send(cards);
     })

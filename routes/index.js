@@ -1,15 +1,20 @@
 const express = require('express');
 const { auth } = require('../middlewares/auth');
+const {
+  validateCreateAndLoginUser,
+} = require('../middlewares/celebrate');
 
 const router = express.Router();
 
-const {createUser, login} = require('../controllers/users');
+const {
+  createUser, login,
+} = require('../controllers/users');
 
 const usersRouter = require('./users');
 const cardsRouter = require('./cards');
 
-router.use('/signin', login);
-router.use('/signup', createUser);
+router.use('/signin', validateCreateAndLoginUser, login);
+router.use('/signup', validateCreateAndLoginUser, createUser);
 
 router.use(auth);
 
