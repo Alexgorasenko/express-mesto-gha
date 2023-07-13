@@ -35,8 +35,7 @@ const createUser = (req, res, next) => {
           next(err);
         }
       });
-  });
-};
+  };
 
 const getUsers = (req, res, next) => {
   User.find({})
