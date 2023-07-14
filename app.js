@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 
 const app = express();
 
+const { errors } = require('celebrate');
+
 const cookieParser = require('cookie-parser');
 
 const router = require('./routes/index');
@@ -17,8 +19,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(router);
 
+app.use(errors());
 app.use(error);
-
 app.listen(3000, () => {
   console.log('Сервер запущен!');
 });
