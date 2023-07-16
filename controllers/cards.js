@@ -50,16 +50,16 @@ const deleteCard = (req, res, next) => {
           new ForbiddenError('Вы не можете удалить эту карточку'),
         );
       } else {
-        Card.findByIdAndRemove(cardId);}
+        // Card.findByIdAndRemove(cardId);
+        Card.deleteOne(card)
+        .then(() => res.send({ message: 'Карточка удалена' }))
+        .catch(next);
+      }
     })
     .then((card) => {
       console.log(card);
       if (card) {
         res.status(200).send({ message: 'Карточка удалена' });
-      } else {
-        return Promise.reject(
-          new NotFoundError('Такой карточки не существует')
-        );
       }
     })
     .catch(next);
