@@ -39,23 +39,21 @@ const getCards = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  const { cardid } = req.params;
-  console.log(req);
-  Card.findById(cardid)
+  const { cardId } = req.params;
+
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
         new NotFoundError('Карточка с указанным id не найдена');
-      }
-      if (card.owner.toString() !== req.user._id) {
+      } else if (card.owner.toString() !== req.user._id) {
         return Promise.reject(
           new ForbiddenError('Вы не можете удалить эту карточку'),
         );
-      }
-    })
-    .then(() => {
-      Card.findByIdAndRemove(req.params.cardId);
+      } else {
+        Card.findByIdAndRemove(cardId);}
     })
     .then((card) => {
+      console.log(card);
       if (card) {
         res.status(200).send({ message: 'Карточка удалена' });
       } else {
