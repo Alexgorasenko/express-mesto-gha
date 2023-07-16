@@ -16,15 +16,16 @@ const UnauthorizedError = require('../utils/UnauthorizedError');
 
 const createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    password,
   } = req.body;
 
   bcrypt.hash(password, SALT_ROUNDS, (error, hash) => {
     User.create({
-      name, about, avatar, email, password: hash,
+      ...req.body, password: hash,
     })
       .then((user) => {
-        res.send(user._id, user.name, user.about, user.avatar, user.email);
+        const { _id, name, about, avatar, email } = user
+        res.send({_id, name, about, avatar, email});
       })
       .catch((err) => {
         console.log(err);
