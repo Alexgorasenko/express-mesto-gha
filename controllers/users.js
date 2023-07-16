@@ -19,12 +19,12 @@ const createUser = (req, res, next) => {
     password,
   } = req.body;
 
-  bcrypt.hash(password, SALT_ROUNDS, (error, hash) => {
+  bcrypt.hash(password, SALT_ROUNDS)
+    .then((hash) => {
     User.create({
       ...req.body, password: hash,
     })
       .then((user) => {
-
         const { _id, name, about, avatar, email } = user;
         res.send({_id, name, about, avatar, email});
       })
@@ -74,6 +74,7 @@ const updateUserData = (Name, data, req, res, next) => {
       res.send(user);
     })
     .catch((err) => {
+
       if (err.name === 'ValidationError') {
         next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
       } else if (err.message === 'Not Found') {
@@ -96,11 +97,13 @@ const updateUsersAvatar = (req, res, next) => {
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
-
   User.findOne({ email })
     .select('+password')
-    .orFail(new UnauthorizedError('Неверный логин или пароль'))
+    // .orFail(new UnauthorizedError('Неверный логин или пароль'))
     .then((user) => {
+      if(!user){
+        return Promise.reject(new UnauthorizedError('Неверная почта или пароль'));
+      }
       bcrypt
         .compare(password, user.password)
         .then((isValidUser) => {
@@ -115,7 +118,10 @@ const login = (req, res, next) => {
             throw new UnauthorizedError('Неверный логин или пароль');
           }
         })
-        .catch(next);
+        .catch((err)=>{
+          console.log(err);
+        })
+        // .catch(next);
     })
     .catch(next);
 };
