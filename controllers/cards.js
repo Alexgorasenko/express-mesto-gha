@@ -36,22 +36,24 @@ const getCards = (req, res, next) => {
 
 const deleteCard = (req, res, next) => {
   const { cardid } = req.params;
+  console.log(req.params);
   Card.findById(cardid)
-    .orFail(new NotFoundError('Карточка с указанным id не найдена'))
+    // .orFail(new NotFoundError('Карточка с указанным id не найдена'))
     .then((card) => {
-      if (!card.owner.equals(req.user._id)) {
-        throw new ForbiddenError('Отсутствие прав для удаления данной карточки');
+      if (!card ){new NotFoundError('Карточка с указанным id не найдена')}
+      if (card.owner.toString() !== req.user._id) {
+        return Promise.reject(new ForbiddenError('Вы не можете удалить эту карточку'));
+      }
+     })
+     .then(()=> {Card.findByIdAndRemove(req.params.cardId)})
+     .then((card) => {
+      if (card) {
+        res.status(200).send({ message: 'Карточка удалена' });
       } else {
-        Card.deleteOne(card).then((removeCard) => res.send(removeCard));
+        return Promise.reject(new NotFoundError('Такой карточки не существует'));
       }
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные для удаления карточки'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 const putLikeCard = (req, res, next) => {
