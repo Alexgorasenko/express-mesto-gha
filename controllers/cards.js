@@ -51,13 +51,7 @@ const deleteCard = (req, res, next) => {
         );
       } else {
         Card.deleteOne(card)
-          .then(() => res.send({ message: 'Карточка удалена' }))
-          .catch(next);
-      }
-    })
-    .then((card) => {
-      if (card) {
-        res.status(200).send({ message: 'Карточка удалена' });
+          .then(() => return res.send({ message: 'Карточка удалена' }))
       }
     })
     .catch(next);

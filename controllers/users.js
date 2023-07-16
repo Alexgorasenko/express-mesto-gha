@@ -111,33 +111,32 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email })
     .select('+password')
-    // .orFail(new UnauthorizedError('Неверный логин или пароль'))
     .then((user) => {
       if (!user) {
-        return Promise.reject(
+        Promise.reject(
           new UnauthorizedError('Неверная почта или пароль'),
         );
+      } else {
+        bcrypt
+          .compare(password, user.password)
+          .then((isValidUser) => {
+            if (isValidUser) {
+              const token = jwt.sign({ _id: user._id }, JWT_SECRET);
+              res.cookie('jwt', token, {
+                maxAge: 3600 * 24 * 7,
+                httpOnly: true,
+              });
+              const {
+                _id, name, about, avatar,
+              } = user;
+              res.send({
+                _id, name, about, avatar, email,
+              });
+            } else {
+              throw new UnauthorizedError('Неверный логин или пароль');
+            }
+          });
       }
-      bcrypt
-        .compare(password, user.password)
-        .then((isValidUser) => {
-          if (isValidUser) {
-            const token = jwt.sign({ _id: user._id }, JWT_SECRET);
-            res.cookie('jwt', token, {
-              maxAge: 3600 * 24 * 7,
-              httpOnly: true,
-            });
-            const {
-              _id, name, about, avatar,
-            } = user;
-            res.send({
-              _id, name, about, avatar, email,
-            });
-          } else {
-            throw new UnauthorizedError('Неверный логин или пароль');
-          }
-        })
-        .catch(next);
     })
     .catch(next);
 };
