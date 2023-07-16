@@ -44,7 +44,7 @@ const deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        Promise.reject(new NotFoundError('Карточка с указанным id не найдена'));
+        throw new NotFoundError('Карточка с указанным id не найдена');
       } else if (card.owner.toString() !== req.user._id) {
         return Promise.reject(
           new ForbiddenError('Вы не можете удалить эту карточку'),
