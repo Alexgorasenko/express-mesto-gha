@@ -24,7 +24,8 @@ const createUser = (req, res, next) => {
       ...req.body, password: hash,
     })
       .then((user) => {
-        const { _id, name, about, avatar, email } = user
+
+        const { _id, name, about, avatar, email } = user;
         res.send({_id, name, about, avatar, email});
       })
       .catch((err) => {
@@ -96,13 +97,14 @@ const updateUsersAvatar = (req, res, next) => {
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findOne({ email })
+  User.findOne({ email })
     .select('+password')
     .orFail(new UnauthorizedError('Неверный логин или пароль'))
     .then((user) => {
       bcrypt
-        .compare(password, user.password, (err, isValidPassword) => {
-          if (isValidPassword) {
+        .compare(password, user.password)
+        .then((isValidUser) => {
+          if (isValidUser) {
             const token = jwt.sign({ _id: user._id }, JWT_SECRET);
             res.cookie('jwt', token, {
               maxAge: 3600 * 24 * 7,
