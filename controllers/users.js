@@ -113,7 +113,8 @@ const login = (req, res, next) => {
               maxAge: 3600 * 24 * 7,
               httpOnly: true,
             });
-            res.send(token);
+            const { _id, name, about, avatar, email } = user;
+            res.send({_id, name, about, avatar, email});
           } else {
             throw new UnauthorizedError('Неверный логин или пароль');
           }
