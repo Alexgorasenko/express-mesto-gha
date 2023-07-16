@@ -49,10 +49,9 @@ const deleteCard = (req, res, next) => {
         return Promise.reject(
           new ForbiddenError('Вы не можете удалить эту карточку'),
         );
-      } else {
-        Card.deleteOne(card)
-          .then(() => return res.send({ message: 'Карточка удалена' }))
       }
+      return Card.deleteOne(card)
+        .then(() => res.status(200).send({ message: 'Карточка удалена' }));
     })
     .catch(next);
 };
