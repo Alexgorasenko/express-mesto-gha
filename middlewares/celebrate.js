@@ -1,33 +1,19 @@
 const { celebrate, Joi } = require('celebrate');
 
-const { regexImageLink } = require('../utils/regexImageLink');
-
-const validateCreateCard = celebrate({
+const validateCreateUser = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().regex(regexImageLink),
-  }),
-});
-
-const validateCardId = celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24),
-  }),
-});
-
-const validateCreateAndLoginUser = celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().regex(regexImageLink),
+    avatar: Joi.string().regex(/^:?https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
   }),
 });
 
-const validateUserId = celebrate({
-  params: Joi.object().keys({
-    id: Joi.string().hex().required().length(24),
+const validateLoginUser = celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
   }),
 });
 
@@ -40,14 +26,38 @@ const validateUpdateUser = celebrate({
 
 const validateUserAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().regex(regexImageLink),
+    avatar: Joi.string()
+      .required()
+      .regex(/^:?https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/),
+  }),
+});
+
+const validateUserId = celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().length(24).hex(),
+  }),
+});
+
+const validateCreateCard = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string()
+      .required()
+      .regex(/^:?https?:\/\/(www\.)?[a-zA-Z\d-]+\.[\w\d\-.~:/?#[\]@!$&'()*+,;=]{2,}#?$/),
+  }),
+});
+
+const validateCardId = celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().length(24).hex(),
   }),
 });
 
 module.exports = {
   validateCreateCard,
   validateCardId,
-  validateCreateAndLoginUser,
+  validateCreateUser,
+  validateLoginUser,
   validateUserId,
   validateUpdateUser,
   validateUserAvatar,
