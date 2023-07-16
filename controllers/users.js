@@ -113,9 +113,7 @@ const login = (req, res, next) => {
     .select('+password')
     .then((user) => {
       if (!user) {
-        Promise.reject(
-          new UnauthorizedError('Неверная почта или пароль'),
-        );
+        throw new UnauthorizedError('Неверный логин или пароль');
       } else {
         bcrypt
           .compare(password, user.password)
