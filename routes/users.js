@@ -6,7 +6,9 @@ const router = express.Router();
 const {
   getUsers, getUser, updateUser, updateUsersAvatar,
 } = require('../controllers/users');
+
 const celebrate = require('../middlewares/celebrate');
+
 router.get('/', getUsers);
 router.get('/me', getUser);
 router.get('/:id', celebrate.validateUserId, getUser);
