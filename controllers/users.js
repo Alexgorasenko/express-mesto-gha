@@ -15,25 +15,32 @@ const NotFoundError = require('../utils/NotFoundError');
 const UnauthorizedError = require('../utils/UnauthorizedError');
 
 const createUser = (req, res, next) => {
-  const {
-    password,
-  } = req.body;
+  const { password } = req.body;
 
-  bcrypt.hash(password, SALT_ROUNDS)
-    .then((hash) => {
+  bcrypt.hash(password, SALT_ROUNDS).then((hash) => {
     User.create({
-      ...req.body, password: hash,
+      ...req.body,
+      password: hash,
     })
       .then((user) => {
-        const { _id, name, about, avatar, email } = user;
-        res.send({_id, name, about, avatar, email});
+        const {
+          _id, name, about, avatar, email,
+        } = user;
+        res.send({
+          _id, name, about, avatar, email,
+        });
       })
       .catch((err) => {
-        console.log(err);
         if (err.name === 'ValidationError') {
-          next(new BadRequestError('Переданы некорректные данные при создании пользователя'));
+          next(
+            new BadRequestError(
+              'Переданы некорректные данные при создании пользователя',
+            ),
+          );
         } else if (err.code === 11000) {
-          next(new ConflictingError('Пользователь с таким email уже существует'));
+          next(
+            new ConflictingError('Пользователь с таким email уже существует'),
+          );
         } else {
           next(err);
         }
@@ -59,7 +66,9 @@ const getUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Переданы некорректные данные при поиске пользователя по id'));
+        next(
+          new BadRequestError('Переданы некорректные данные при поиске пользователя по id'),
+        );
       } else if (err.message === 'Not Found') {
         next(new NotFoundError('Пользователь по указанному _id не найден'));
       } else {
@@ -74,9 +83,12 @@ const updateUserData = (Name, data, req, res, next) => {
       res.send(user);
     })
     .catch((err) => {
-
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при обновлении профиля'));
+        next(
+          new BadRequestError(
+            'Переданы некорректные данные при обновлении профиля',
+          ),
+        );
       } else if (err.message === 'Not Found') {
         next(new NotFoundError('Пользователь с указанным id не найден'));
       } else {
@@ -101,8 +113,10 @@ const login = (req, res, next) => {
     .select('+password')
     // .orFail(new UnauthorizedError('Неверный логин или пароль'))
     .then((user) => {
-      if(!user){
-        return Promise.reject(new UnauthorizedError('Неверная почта или пароль'));
+      if (!user) {
+        return Promise.reject(
+          new UnauthorizedError('Неверная почта или пароль'),
+        );
       }
       bcrypt
         .compare(password, user.password)
@@ -113,16 +127,17 @@ const login = (req, res, next) => {
               maxAge: 3600 * 24 * 7,
               httpOnly: true,
             });
-            const { _id, name, about, avatar, email } = user;
-            res.send({_id, name, about, avatar, email});
+            const {
+              _id, name, about, avatar,
+            } = user;
+            res.send({
+              _id, name, about, avatar, email,
+            });
           } else {
             throw new UnauthorizedError('Неверный логин или пароль');
           }
         })
-        .catch((err)=>{
-          console.log(err);
-        })
-        // .catch(next);
+        .catch(next);
     })
     .catch(next);
 };

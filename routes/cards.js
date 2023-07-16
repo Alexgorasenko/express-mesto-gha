@@ -7,6 +7,7 @@ const {
 } = require('../controllers/cards');
 
 const celebrate = require('../middlewares/celebrate');
+
 router.post('/', celebrate.validateCreateCard, createCard);
 router.get('/', getCards);
 router.delete('/:cardId', celebrate.validateCardId, deleteCard);

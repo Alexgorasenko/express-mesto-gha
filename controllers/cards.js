@@ -21,8 +21,8 @@ const createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(
           new BadRequestError(
-            'Переданы некорректные данные при создании карточки'
-          )
+            'Переданы некорректные данные при создании карточки',
+          ),
         );
       } else {
         next(err);
@@ -44,20 +44,18 @@ const deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        new NotFoundError('Карточка с указанным id не найдена');
+        Promise.reject(new NotFoundError('Карточка с указанным id не найдена'));
       } else if (card.owner.toString() !== req.user._id) {
         return Promise.reject(
           new ForbiddenError('Вы не можете удалить эту карточку'),
         );
       } else {
-        // Card.findByIdAndRemove(cardId);
         Card.deleteOne(card)
-        .then(() => res.send({ message: 'Карточка удалена' }))
-        .catch(next);
+          .then(() => res.send({ message: 'Карточка удалена' }))
+          .catch(next);
       }
     })
     .then((card) => {
-      console.log(card);
       if (card) {
         res.status(200).send({ message: 'Карточка удалена' });
       }
@@ -71,7 +69,7 @@ const putLikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(new NotFoundError('Передан несуществующий id карточки'))
     .then((cards) => {
@@ -81,8 +79,8 @@ const putLikeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         next(
           new BadRequestError(
-            'Переданы некорректные данные для добавления лайка'
-          )
+            'Переданы некорректные данные для добавления лайка',
+          ),
         );
       } else {
         next(err);
@@ -95,7 +93,7 @@ const deleteLikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     cardId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .orFail(new NotFoundError('Передан несуществующий id карточки'))
     .then((cards) => {
@@ -104,7 +102,7 @@ const deleteLikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         next(
-          new BadRequestError('Переданы некорректные данные для удаления лайка')
+          new BadRequestError('Переданы некорректные данные для удаления лайка'),
         );
       } else {
         next(err);
