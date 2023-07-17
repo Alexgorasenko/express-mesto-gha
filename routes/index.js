@@ -1,6 +1,7 @@
 const express = require('express');
 const { auth } = require('../middlewares/auth');
 const celebrate = require('../middlewares/celebrate');
+const NotFoundError = require('../utils/NotFoundError');
 
 const router = express.Router();
 
@@ -20,8 +21,8 @@ router.use('/users', usersRouter);
 
 router.use('/cards', cardsRouter);
 
-router.use('/*', (req, res) => {
-  res.status(404).send({ message: 'Страница не найдена' });
+router.use('/*', (req, res, next) => {
+  next(new NotFoundError('Страница не найдена'));
 });
 
 module.exports = router;

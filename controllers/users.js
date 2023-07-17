@@ -69,8 +69,6 @@ const getUser = (req, res, next) => {
         next(
           new BadRequestError('Переданы некорректные данные при поиске пользователя по id'),
         );
-      } else if (err.message === 'Not Found') {
-        next(new NotFoundError('Пользователь по указанному _id не найден'));
       } else {
         next(err);
       }
@@ -89,8 +87,6 @@ const updateUserData = (Name, data, req, res, next) => {
             'Переданы некорректные данные при обновлении профиля',
           ),
         );
-      } else if (err.message === 'Not Found') {
-        next(new NotFoundError('Пользователь с указанным id не найден'));
       } else {
         next(err);
       }
@@ -115,7 +111,7 @@ const login = (req, res, next) => {
       if (!user) {
         throw new UnauthorizedError('Неверный логин или пароль');
       } else {
-        bcrypt
+        return bcrypt
           .compare(password, user.password)
           .then((isValidUser) => {
             if (isValidUser) {
@@ -133,7 +129,8 @@ const login = (req, res, next) => {
             } else {
               throw new UnauthorizedError('Неверный логин или пароль');
             }
-          });
+          })
+          .catch(next);
       }
     })
     .catch(next);
